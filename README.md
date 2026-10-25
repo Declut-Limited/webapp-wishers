@@ -7,7 +7,7 @@ Stack: React 19 + Vite, TypeScript, Tailwind 4, shadcn/ui, TanStack Query, React
 ```
 cp .env.example .env   # VITE_API_URL
 npm install
-npm run dev            # http://localhost:3026
+npm run dev            # http://localhost:5173
 ```
 
 Notes

@@ -71,7 +71,7 @@ export function ProfileForm({ inline, onDone, onCancel }: { inline?: boolean; on
 
             <div className={cn("grid gap-5", inline && "sm:grid-cols-2")}>
                 <FormField id={`name${inline ? "-i" : ""}`} label="Full name">
-                    <Input id={`name${inline ? "-i" : ""}`} autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} className="h-11" />
+                    <Input id={`name${inline ? "-i" : ""}`} autoComplete="name" placeholder="Enter your full name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} className="h-11" />
                 </FormField>
                 <FormField id={`email${inline ? "-i" : ""}`} label="Email" hint="Your email can't be changed.">
                     <Input id={`email${inline ? "-i" : ""}`} value={user.email} disabled className="h-11" />

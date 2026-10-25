@@ -42,13 +42,13 @@ export function ChangePasswordForm({ onDone, onCancel, inline }: { onDone?: () =
         <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
             <div className={cn("grid gap-5", inline && "sm:grid-cols-3")}>
                 <FormField id={`currentPassword${inline ? "-i" : ""}`} label="Current password">
-                    <PasswordInput id={`currentPassword${inline ? "-i" : ""}`} autoComplete="current-password" value={form.current} onChange={(e) => setForm({ ...form, current: e.target.value })} />
+                    <PasswordInput id={`currentPassword${inline ? "-i" : ""}`} autoComplete="current-password" placeholder="Enter your current password" value={form.current} onChange={(e) => setForm({ ...form, current: e.target.value })} />
                 </FormField>
                 <FormField id={`newPassword${inline ? "-i" : ""}`} label="New password" hint={inline ? undefined : PASSWORD_HINT}>
-                    <PasswordInput id={`newPassword${inline ? "-i" : ""}`} autoComplete="new-password" maxLength={64} value={form.next} onChange={(e) => setForm({ ...form, next: e.target.value })} />
+                    <PasswordInput id={`newPassword${inline ? "-i" : ""}`} autoComplete="new-password" placeholder="Create a new password" maxLength={64} value={form.next} onChange={(e) => setForm({ ...form, next: e.target.value })} />
                 </FormField>
                 <FormField id={`confirmPassword${inline ? "-i" : ""}`} label="Confirm new password">
-                    <PasswordInput id={`confirmPassword${inline ? "-i" : ""}`} autoComplete="new-password" maxLength={64} value={form.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} />
+                    <PasswordInput id={`confirmPassword${inline ? "-i" : ""}`} autoComplete="new-password" placeholder="Re-enter the new password" maxLength={64} value={form.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} />
                 </FormField>
             </div>
             {inline && <p className="-mt-2 text-xs text-muted-foreground">{PASSWORD_HINT} Other devices are signed out.</p>}
