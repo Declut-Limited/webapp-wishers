@@ -53,7 +53,9 @@ export default function WishlistItem() {
 
     const wishes = wishlist.wishItems ?? [];
     const percent = calculatePercentage(wishlist.totalAmountReceived ?? 0, wishlist.totalGoalAmount ?? 0);
-    const atWishLimit = !!settings?.wishItemCreationLimit && wishes.length >= settings.wishItemCreationLimit;
+    // An empty wishlist has nothing to give towards, so it can't be shared yet.
+    const canShare = wishes.length > 0;
+    const atWishLimit =!!settings?.wishItemCreationLimit && wishes.length >= settings.wishItemCreationLimit;
 
     const openWishForm = () => {
         if (atWishLimit) return toast.error(`You cannot create more than ${settings!.wishItemCreationLimit} wishes in a wishlist`);
@@ -125,9 +127,11 @@ export default function WishlistItem() {
                 <WishlistInsights wishlist={wishlist} />
             </div>
 
-            <div className="mt-3">
-                <ShareLinkBox title={wishlist.title} link={wishlist.link} />
-            </div>
+            {canShare && (
+                <div className="mt-3">
+                    <ShareLinkBox title={wishlist.title} link={wishlist.link} />
+                </div>
+            )}
 
             <div className="mt-8 mb-4 flex items-center justify-between gap-4">
                 <h2 className="text-xl font-extrabold">Wishes <span className="text-muted-foreground">({wishes.length})</span></h2>
@@ -210,7 +214,11 @@ export default function WishlistItem() {
                             </div>
                         </div>
                     </section>
-                    <ShareLinkBox title={wishlist.title} link={wishlist.link} />
+                    {canShare ? (
+                        <ShareLinkBox title={wishlist.title} link={wishlist.link} />
+                    ) : (
+                        <p className="rounded-2xl bg-secondary p-4 text-sm text-muted-foreground">Add a wish to get your share link.</p>
+                    )}
                 </aside>
             </div>
 

@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 
-export function TopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
+// hideMenuOnPhone: the bottom bar replaces the menu button at 500px and below.
+export function TopBar({ onOpenMenu, hideMenuOnPhone }: { onOpenMenu: () => void; hideMenuOnPhone?: boolean }) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -26,7 +28,7 @@ export function TopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
 
     return (
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur sm:px-6">
-            <Button variant="ghost" size="icon" className="lg:hidden" onClick={onOpenMenu} aria-label="Open menu">
+            <Button variant="ghost" size="icon" className={cn("lg:hidden", hideMenuOnPhone && "max-[500px]:hidden")} onClick={onOpenMenu} aria-label="Open menu">
                 <PiListBold className="size-5" />
             </Button>
             <Link to="/" className="lg:hidden" aria-label="Wishers home">

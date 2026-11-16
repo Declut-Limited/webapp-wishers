@@ -5,13 +5,17 @@ import type { IconType } from "react-icons";
 import {
     PiArrowRightBold,
     PiCaretRightBold,
+    PiCheckBold,
     PiCopyBold,
+    PiDotsThreeOutlineBold,
     PiFileTextBold,
     PiGiftBold,
     PiLifebuoyBold,
     PiPaletteBold,
     PiShieldCheckBold,
+    PiSidebarSimpleBold,
     PiSignOutBold,
+    PiSpinnerBold,
     PiUserBold,
 } from "react-icons/pi";
 import { toast } from "sonner";
@@ -23,7 +27,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/hooks/useSettings";
+import type { NavLayout } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { errorMessage } from "@/utils/validation";
 import { ChangePasswordDialog, ChangePasswordForm } from "./components/ChangePasswordDialog";
 import { EditProfileDialog } from "./components/EditProfileDialog";
 import { ProfileForm } from "./components/ProfileForm";
@@ -76,6 +82,64 @@ function ThemePicker() {
                 <TabsTrigger value="system" className="sm:px-6">System</TabsTrigger>
             </TabsList>
         </Tabs>
+    );
+}
+
+const NAV_LAYOUTS: { value: NavLayout; icon: IconType; title: string; description: string }[] = [
+    { value: "sidebar", icon: PiSidebarSimpleBold, title: "Sidebar", description: "Menu behind the button at the top left." },
+    { value: "bottom", icon: PiDotsThreeOutlineBold, title: "Bottom bar", description: "Tabs along the bottom, like the mobile app." },
+];
+
+// Menu style, saved on the account (FireRepl's display-format cards).
+function NavLayoutPicker() {
+    const { user, setNavLayout } = useAuth();
+    const current = user?.navLayout ?? "sidebar";
+    const [saving, setSaving] = useState(false);
+
+    const choose = async (value: NavLayout) => {
+        if (value === current || saving) return;
+        setSaving(true);
+        try {
+            await setNavLayout(value);
+            toast.success(value === "bottom" ? "Switched to the bottom bar" : "Switched to the sidebar");
+        } catch (err) {
+            toast.error(errorMessage(err, "Could not save your menu style"));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <div role="radiogroup" aria-label="Menu style" className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {NAV_LAYOUTS.map(({ value, icon: Icon, title, description }) => {
+                const selected = current === value;
+                return (
+                    <button
+                        key={value}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        disabled={saving}
+                        onClick={() => choose(value)}
+                        className={cn(
+                            "relative flex cursor-pointer flex-col items-start gap-2 rounded-xl border p-4 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-wait",
+                            selected ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50",
+                        )}
+                    >
+                        {selected && (
+                            <span className="absolute top-3 right-3 flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                {saving ? <PiSpinnerBold className="size-3 animate-spin" aria-hidden /> : <PiCheckBold className="size-3" aria-hidden />}
+                            </span>
+                        )}
+                        <Icon className={cn("size-5", selected ? "text-primary" : "text-muted-foreground")} aria-hidden />
+                        <span>
+                            <span className="block text-sm font-semibold">{title}</span>
+                            <span className="mt-0.5 block text-xs text-muted-foreground">{description}</span>
+                        </span>
+                    </button>
+                );
+            })}
+        </div>
     );
 }
 
@@ -177,6 +241,11 @@ export default function Profile() {
                     </DialogHeader>
                     <div className="flex flex-col gap-5">
                         <ThemePicker />
+                        {/* Phones only (500px and below): the bottom bar doesn't show on bigger screens. */}
+                        <div className="hidden max-[500px]:block">
+                            <p className="mb-2 text-sm font-semibold">Navigation</p>
+                            <NavLayoutPicker />
+                        </div>
                         <Button variant="outline" onClick={() => setOpen("password")} className="font-bold">Change password</Button>
                     </div>
                 </DialogContent>

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useSettings } from "@/hooks/useSettings";
+import { celebrate } from "@/lib/confetti";
 import type { Wishlist } from "@/lib/types";
 import type { ImageValue } from "@/services/imageService";
 import { saveWishlist } from "@/services/wishlistService";
@@ -17,6 +19,7 @@ type Props = { open: boolean; onOpenChange: (open: boolean) => void; wishlist?: 
 // Create, or edit when a wishlist is passed. Mounted fresh each time it opens (key it on open).
 export function WishlistFormDialog({ open, onOpenChange, wishlist }: Props) {
     const navigate = useNavigate();
+    const settings = useSettings();
     const [title, setTitle] = useState(wishlist?.title ?? "");
     const [description, setDescription] = useState(wishlist?.description ?? "");
     const [images, setImages] = useState<ImageValue[]>(wishlist?.image ? [wishlist.image] : []);
@@ -31,7 +34,10 @@ export function WishlistFormDialog({ open, onOpenChange, wishlist }: Props) {
             const saved = await saveWishlist({ _id: wishlist?._id, title: title.trim(), description: description.trim(), image: images[0] });
             toast.success(wishlist ? "Wishlist updated" : "Wishlist created, now add your wishes");
             onOpenChange(false);
-            if (!wishlist) navigate(`/wishlists/${saved._id}`);
+            if (!wishlist) {
+                navigate(`/wishlists/${saved._id}`);
+                if (settings?.shouldDisplayConfetti) celebrate();
+            }
         } catch (err) {
             toast.error(errorMessage(err, "Could not save the wishlist"));
         } finally {

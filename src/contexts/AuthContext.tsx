@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { api, setSessionExpiredHandler, tokenStore } from "@/lib/api";
 import { queryClient } from "@/lib/query-client";
 import { connectRealtime, disconnectRealtime } from "@/lib/realtime";
-import type { TokenResponse, User } from "@/lib/types";
+import type { NavLayout, TokenResponse, User } from "@/lib/types";
 
 type AuthContextType = {
     user: User | null;
@@ -15,6 +15,8 @@ type AuthContextType = {
     resendVerificationCode: () => Promise<string | undefined>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
+    // Switches at once, then saves; switches back if the save fails.
+    setNavLayout: (navLayout: NavLayout) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -92,8 +94,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(await api<User>("/users/me"));
     };
 
+    const setNavLayout = async (navLayout: NavLayout) => {
+        const previous = user?.navLayout;
+        setUser((u) => (u ? { ...u, navLayout } : u));
+        try {
+            await api("/users/me", { method: "PATCH", body: { navLayout } });
+        } catch (err) {
+            setUser((u) => (u ? { ...u, navLayout: previous } : u));
+            throw err;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, restoring, login, register, verifyEmail, resendVerificationCode, logout, refreshUser }}>
+        <AuthContext.Provider value={{ user, restoring, login, register, verifyEmail, resendVerificationCode, logout, refreshUser, setNavLayout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,14 +1,16 @@
 import { Suspense, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { SidebarBody } from "@/components/layout/AppSidebar";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { TopBar } from "@/components/layout/TopBar";
 import { PageLoader } from "@/components/PageLoader";
 import { Splash } from "@/components/Splash";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 
-// Signed-in, verified users only, inside the app shell (ClipBay's pattern):
-// fixed sidebar on desktop (lg+) and the same menu sliding out below that. No bottom bar: it's a web app.
+// Signed-in, verified users only, inside the app shell (ClipBay's pattern): a fixed sidebar on desktop (lg+)
+// and the same menu sliding out below that; on phones (500px and below) a bottom bar instead, if chosen in Profile.
 export default function ProtectedRoute() {
     const { user, restoring } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
@@ -16,6 +18,8 @@ export default function ProtectedRoute() {
     if (restoring) return <Splash />;
     if (!user) return <Navigate to="/login" replace />;
     if (!user.emailVerified) return <Navigate to="/verify-email" replace />;
+
+    const bottomNav = user.navLayout === "bottom";
 
     return (
         <div className="min-h-dvh bg-background">
@@ -40,9 +44,12 @@ export default function ProtectedRoute() {
                 </SheetContent>
             </Sheet>
 
+            {/* Phones (500px and below) can swap the menu button for a bottom bar. */}
+            {bottomNav && <BottomNav className="min-[501px]:hidden" />}
+
             <div className="lg:pl-64">
-                <TopBar onOpenMenu={() => setMenuOpen(true)} />
-                <main id="main" className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+                <TopBar onOpenMenu={() => setMenuOpen(true)} hideMenuOnPhone={bottomNav} />
+                <main id="main" className={cn("mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8", bottomNav && "max-[500px]:pb-28")}>
                     <Suspense fallback={<PageLoader />}>
                         <Outlet />
                     </Suspense>

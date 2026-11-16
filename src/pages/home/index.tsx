@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLiveQuery } from "@/hooks/useLiveQuery";
 import type { Contributor, Page, Wallet, Wishlist } from "@/lib/types";
 import { formatCurrency, greeting, shareLink } from "@/utils/helper";
+import { BankDetailsPrompt } from "./components/BankDetailsPrompt";
 import { QuickActions } from "./components/QuickActions";
 import { RecentGivers } from "./components/RecentGivers";
 import { TopWishlistCard } from "./components/TopWishlistCard";
@@ -32,6 +33,11 @@ export default function Home() {
 
     const handleShare = () => {
         if (!topWishlist?.link) return navigate("/wishlists");
+        // Nothing to give towards yet: add a wish before sharing.
+        if (!topWishlist.totalWishItems) {
+            toast.warning("Add a wish first", { description: "An empty wishlist can't be shared yet" });
+            return navigate(`/wishlists/${topWishlist._id}`);
+        }
         shareLink(topWishlist.title, topWishlist.link, () => toast.success("Wishlist link copied"));
     };
 
@@ -67,6 +73,7 @@ export default function Home() {
             </div>
 
             <ContributorSheet id={giverId} onClose={() => setGiverId(null)} />
+            <BankDetailsPrompt />
         </div>
     );
 }

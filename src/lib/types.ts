@@ -12,8 +12,12 @@ export type User = {
     inviteCode: string;
     referredBy?: string;
     referralsCount: number;
+    // Main menu: a sidebar, or a bottom bar (saved on the account).
+    navLayout?: NavLayout;
     createdAt?: string;
 };
+
+export type NavLayout = "sidebar" | "bottom";
 
 export type TokenResponse = { accessToken: string; refreshToken: string; emailVerified: boolean };
 

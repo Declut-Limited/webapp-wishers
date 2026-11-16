@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSettings } from "@/hooks/useSettings";
+import { celebrate } from "@/lib/confetti";
 import type { WishItem } from "@/lib/types";
 import type { ImageValue } from "@/services/imageService";
 import { saveWish } from "@/services/wishlistService";
@@ -42,6 +43,7 @@ export function WishFormDialog({ open, onOpenChange, wishlistId, wish }: Props) 
             await saveWish({ _id: wish?._id, wishlistId, title: title.trim(), description: description.trim(), goalAmount, images });
             toast.success(wish ? "Wish updated" : "Wish added");
             onOpenChange(false);
+            if (!wish && settings?.shouldDisplayConfetti) celebrate();
         } catch (err) {
             toast.error(errorMessage(err, "Could not save the wish"));
         } finally {
