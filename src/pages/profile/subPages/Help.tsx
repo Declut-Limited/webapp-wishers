@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Input } from "@/components/ui/input";
 import { FAQ_SECTIONS } from "@/constants/faqs";
 
-const SUPPORT_EMAIL = "support@wishers.app";
+const SUPPORT_EMAIL = "support@wishers.com.ng";
 const WHATSAPP_NUMBER = "2349057643470";
 const LIVE_CHAT_URL = "https://tawk.to/chat/693b4b7e66ccb91985cf4fa4/1jc7ptppl";
 

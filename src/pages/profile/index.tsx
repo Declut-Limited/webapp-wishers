@@ -80,8 +80,8 @@ function ThemePicker() {
 }
 
 const LEGAL = [
-    { icon: PiShieldCheckBold, title: "Privacy policy", text: "How we handle your data", href: "https://wishers.app/privacy-policy" },
-    { icon: PiFileTextBold, title: "Terms of use", text: "The rules for using Wishers", href: "https://wishers.app/terms-of-use" },
+    { icon: PiShieldCheckBold, title: "Privacy policy", text: "How we handle your data", href: "https://wishers.com.ng/privacy-policy" },
+    { icon: PiFileTextBold, title: "Terms of use", text: "The rules for using Wishers", href: "https://wishers.com.ng/terms-of-use" },
 ];
 
 export default function Profile() {
