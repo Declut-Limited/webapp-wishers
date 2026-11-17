@@ -1,6 +1,6 @@
 import { Progress } from "@/components/ui/progress";
 import type { Wishlist } from "@/lib/types";
-import { formatCurrency, formatShortCurrency } from "@/utils/helper";
+import { calculatePercentage, formatCurrency, formatShortCurrency } from "@/utils/helper";
 
 // The mobile wishlists tab's overview: total raised, completed and givers.
 // Phones: raised on the left, the two counts stacked on the right (as on mobile).
@@ -11,7 +11,7 @@ export function WishlistSummary({ wishlists }: { wishlists: Wishlist[] }) {
     const goal = wishlists.reduce((n, w) => n + (w.totalGoalAmount ?? 0), 0);
     const givers = wishlists.reduce((n, w) => n + (w.totalContributors ?? 0), 0);
     const completed = wishlists.filter((w) => w.isCompleted).length;
-    const percent = goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
+    const percent = calculatePercentage(raised, goal);
     const across = `${total} ${total === 1 ? "wishlist" : "wishlists"}`;
 
     const counts = [

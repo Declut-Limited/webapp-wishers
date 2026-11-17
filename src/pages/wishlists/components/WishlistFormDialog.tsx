@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { FormField } from "@/components/form/FormField";
 import { ImagesInput } from "@/components/form/ImagesInput";
+import { FullScreenForm } from "@/components/FullScreenForm";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSettings } from "@/hooks/useSettings";
@@ -46,32 +46,31 @@ export function WishlistFormDialog({ open, onOpenChange, wishlist }: Props) {
     };
 
     return (
-        <Dialog open={open} onOpenChange={(o) => !saving && onOpenChange(o)}>
-            <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-lg">
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-extrabold">{wishlist ? "Edit wishlist" : "New wishlist"}</DialogTitle>
-                        <DialogDescription>{wishlist ? "Update the name, note or cover photo." : "Give it a name and a cover photo. You'll add wishes next."}</DialogDescription>
-                    </DialogHeader>
+        <FullScreenForm
+            open={open}
+            onOpenChange={onOpenChange}
+            busy={saving}
+            onSubmit={handleSubmit}
+            title={wishlist ? "Edit wishlist" : "New wishlist"}
+            description={wishlist ? "Update the name, note or cover photo." : "Give it a name and a cover photo. You'll add wishes next."}
+            footer={
+                <>
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>Cancel</Button>
+                    <Button type="submit" disabled={saving} className="font-bold">
+                        {saving ? "Saving…" : wishlist ? "Save changes" : "Create wishlist"}
+                    </Button>
+                </>
+            }
+        >
+            <ImagesInput id="wishlist-image" value={images} onChange={setImages} />
 
-                    <ImagesInput id="wishlist-image" value={images} onChange={setImages} />
+            <FormField id="wishlist-title" label="Wishlist name" action={<span className="text-xs text-muted-foreground">{title.length}/100</span>}>
+                <Input id="wishlist-title" placeholder="e.g. My 30th birthday" maxLength={100} value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" autoFocus />
+            </FormField>
 
-                    <FormField id="wishlist-title" label="Wishlist name" action={<span className="text-xs text-muted-foreground">{title.length}/100</span>}>
-                        <Input id="wishlist-title" placeholder="e.g. My 30th birthday" maxLength={100} value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" autoFocus />
-                    </FormField>
-
-                    <FormField id="wishlist-description" label="Description" hint="A short note for the people giving." action={<span className="text-xs text-muted-foreground">{description.length}/150</span>}>
-                        <Textarea id="wishlist-description" placeholder="Optional" maxLength={150} rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
-                    </FormField>
-
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>Cancel</Button>
-                        <Button type="submit" disabled={saving} className="font-bold">
-                            {saving ? "Saving…" : wishlist ? "Save changes" : "Create wishlist"}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
+            <FormField id="wishlist-description" label="Description" hint="A short note for the people giving." action={<span className="text-xs text-muted-foreground">{description.length}/150</span>}>
+                <Textarea id="wishlist-description" placeholder="Optional" maxLength={150} rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+            </FormField>
+        </FullScreenForm>
     );
 }

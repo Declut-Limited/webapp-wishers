@@ -2,8 +2,8 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { FormField } from "@/components/form/FormField";
 import { ImagesInput } from "@/components/form/ImagesInput";
+import { FullScreenForm } from "@/components/FullScreenForm";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSettings } from "@/hooks/useSettings";
@@ -52,49 +52,48 @@ export function WishFormDialog({ open, onOpenChange, wishlistId, wish }: Props) 
     };
 
     return (
-        <Dialog open={open} onOpenChange={(o) => !saving && onOpenChange(o)}>
-            <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-xl">
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-extrabold">{wish ? "Edit wish" : "Add a wish"}</DialogTitle>
-                        <DialogDescription>Up to {maxImages} photos; the first one is the cover.</DialogDescription>
-                    </DialogHeader>
+        <FullScreenForm
+            open={open}
+            onOpenChange={onOpenChange}
+            busy={saving}
+            onSubmit={handleSubmit}
+            title={wish ? "Edit wish" : "Add a wish"}
+            description={`Up to ${maxImages} photos; the first one is the cover.`}
+            footer={
+                <>
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>Cancel</Button>
+                    <Button type="submit" disabled={saving} className="font-bold">
+                        {saving ? "Saving…" : wish ? "Save changes" : "Add wish"}
+                    </Button>
+                </>
+            }
+        >
+            <ImagesInput id="wish-images" value={images} onChange={setImages} max={maxImages} />
 
-                    <ImagesInput id="wish-images" value={images} onChange={setImages} max={maxImages} />
+            <FormField id="wish-title" label="What do you wish for?" action={<span className="text-xs text-muted-foreground">{title.length}/100</span>}>
+                <Input id="wish-title" placeholder="e.g. iPhone 17 Pro" maxLength={100} value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
+            </FormField>
 
-                    <FormField id="wish-title" label="What do you wish for?" action={<span className="text-xs text-muted-foreground">{title.length}/100</span>}>
-                        <Input id="wish-title" placeholder="e.g. iPhone 17 Pro" maxLength={100} value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
-                    </FormField>
+            <FormField
+                id="wish-goal"
+                label="Goal amount (₦)"
+                hint={goalLocked ? "The goal can't change once someone has contributed." : `Minimum ${formatCurrency(min)}`}
+            >
+                <Input
+                    id="wish-goal"
+                    inputMode="numeric"
+                    placeholder="0"
+                    maxLength={settings?.maxGoalAmountDigits ?? 10}
+                    value={goal}
+                    onChange={(e) => setGoal(e.target.value.replace(/\D/g, ""))}
+                    disabled={goalLocked}
+                    className="h-11"
+                />
+            </FormField>
 
-                    <FormField
-                        id="wish-goal"
-                        label="Goal amount (₦)"
-                        hint={goalLocked ? "The goal can't change once someone has contributed." : `Minimum ${formatCurrency(min)}`}
-                    >
-                        <Input
-                            id="wish-goal"
-                            inputMode="numeric"
-                            placeholder="0"
-                            maxLength={settings?.maxGoalAmountDigits ?? 10}
-                            value={goal}
-                            onChange={(e) => setGoal(e.target.value.replace(/\D/g, ""))}
-                            disabled={goalLocked}
-                            className="h-11"
-                        />
-                    </FormField>
-
-                    <FormField id="wish-description" label="Description" hint="Size, colour, model or why it matters to you." action={<span className="text-xs text-muted-foreground">{description.length}/150</span>}>
-                        <Textarea id="wish-description" placeholder="Optional" maxLength={150} rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
-                    </FormField>
-
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>Cancel</Button>
-                        <Button type="submit" disabled={saving} className="font-bold">
-                            {saving ? "Saving…" : wish ? "Save changes" : "Add wish"}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
+            <FormField id="wish-description" label="Description" hint="Size, colour, model or why it matters to you." action={<span className="text-xs text-muted-foreground">{description.length}/150</span>}>
+                <Textarea id="wish-description" placeholder="Optional" maxLength={150} rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+            </FormField>
+        </FullScreenForm>
     );
 }

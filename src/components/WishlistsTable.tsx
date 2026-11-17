@@ -39,7 +39,7 @@ export function WishlistsTable({ wishlists, compact }: { wishlists: Wishlist[]; 
                             <TableCell>
                                 <div className="flex items-center gap-3">
                                     <Progress value={percent} aria-label={`${percent}% raised`} className="h-1.5 flex-1" />
-                                    <span className="w-10 shrink-0 text-right text-xs font-semibold">{percent}%</span>
+                                    <span className="w-14 shrink-0 text-right text-xs font-semibold">{percent}%</span>
                                 </div>
                                 <p className="mt-1 text-xs text-muted-foreground">
                                     <span className="font-bold text-foreground">{formatCurrency(w.totalAmountReceived ?? 0)}</span> of {formatCurrency(w.totalGoalAmount ?? 0)}

@@ -20,7 +20,7 @@ export function ProgressRing({ percent, size = 56, stroke = 5 }: { percent: numb
                     className="stroke-brand-light transition-[stroke-dashoffset] duration-700 dark:stroke-brand-lime-dark"
                 />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center font-bold" style={{ fontSize: Math.max(10, Math.round(size * 0.22)) }}>{Math.round(clamped)}%</span>
+            <span className="absolute inset-0 flex items-center justify-center font-bold" style={{ fontSize: Math.max(10, Math.round(size * 0.22)) }}>{clamped}%</span>
         </div>
     );
 }

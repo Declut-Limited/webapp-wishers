@@ -17,7 +17,10 @@ export function formatShortCurrency(amount: number): string {
 export function calculatePercentage(current: number, target: number): number {
     if (!target) return 0;
     const percentage = (current / target) * 100;
-    return percentage >= 100 ? 100 : Number(percentage.toFixed(percentage % 1 === 0 ? 0 : 1));
+    if (percentage >= 100) return 100;
+    if (percentage <= 0) return 0;
+    // One decimal (45.7), but a small gift never reads as 0% and an unfinished goal never as 100%.
+    return Math.min(Math.max(Number(percentage.toFixed(1)), 0.1), 99.9);
 }
 
 // "25 Oct 2026, 09:30 pm"
