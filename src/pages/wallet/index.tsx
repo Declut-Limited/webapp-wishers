@@ -70,9 +70,10 @@ export default function Wallet() {
                 Gifts and referral earnings are paid straight into your bank account, usually within 24 hours.
             </p>
 
-            {/* Phones: payout account, then transactions. Desktop: transactions with the account beside them. */}
-            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-                <section aria-labelledby="bank" className="flex flex-col gap-4 rounded-2xl border bg-card p-5 lg:sticky lg:top-24 lg:order-2 lg:rounded-2xl">
+            {/* Phones: payout account, then transactions. Desktop: transactions with the account beside them.
+                grid-cols-1 and min-w-0 keep a long bank name or title from widening the page past the screen. */}
+            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+                <section aria-labelledby="bank" className="flex min-w-0 flex-col gap-4 rounded-2xl border bg-card p-5 lg:sticky lg:top-24 lg:order-2 lg:rounded-2xl">
                     <h2 id="bank" className="text-xs font-bold tracking-[0.12em] text-muted-foreground uppercase">Payout account</h2>
                     {bank.isPending ? (
                         <Skeleton className="mt-4 h-24" />
@@ -84,7 +85,11 @@ export default function Wallet() {
                                 </span>
                                 <div className="min-w-0">
                                     <p className="truncate font-bold">{bank.data.accountName}</p>
-                                    <p className="truncate text-sm text-muted-foreground">{bank.data.bankName} · {bank.data.maskedAccountNumber || bank.data.accountNumber}</p>
+                                    {/* A long bank name is cut short; the account number always shows in full. */}
+                                    <p className="flex min-w-0 text-sm text-muted-foreground">
+                                        <span className="truncate">{bank.data.bankName}</span>
+                                        <span className="shrink-0 whitespace-pre"> · {bank.data.maskedAccountNumber || bank.data.accountNumber}</span>
+                                    </p>
                                 </div>
                             </div>
                             <Button variant="outline" asChild className="mt-auto font-bold">
@@ -135,7 +140,8 @@ export default function Wallet() {
                             <TableBody>
                                 {txs.items.map((tx) => (
                                     <TableRow key={tx._id} onClick={() => setTxId(tx._id)} className="cursor-pointer">
-                                        <TableCell className="max-w-56 pl-5">
+                                        {/* w-full + max-w-0 lets the title truncate; a table cell ignores a plain max width. */}
+                                        <TableCell className="w-full max-w-0 pl-5">
                                             <button type="button" onClick={() => setTxId(tx._id)} className="block w-full truncate text-left font-semibold focus-visible:underline focus-visible:outline-none">
                                                 {transactionTitle(tx)}
                                             </button>

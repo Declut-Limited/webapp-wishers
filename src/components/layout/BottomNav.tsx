@@ -3,7 +3,7 @@ import { PiPlusBold } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS, type NavItem } from "./nav";
 
-function Tab({ to, label, icon: Icon, activeIcon: ActiveIcon }: NavItem) {
+function Tab({ to, label, barIcon: Icon, activeIcon: ActiveIcon }: NavItem) {
     return (
         <NavLink
             to={to}
