@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input";
 import { FAQ_SECTIONS } from "@/constants/faqs";
 
 const SUPPORT_EMAIL = "support@wishers.com.ng";
-const WHATSAPP_NUMBER = "2349057643470";
-const LIVE_CHAT_URL = "https://tawk.to/chat/693b4b7e66ccb91985cf4fa4/1jc7ptppl";
+const WHATSAPP_NUMBER = "2347072350000";
+const LIVE_CHAT_URL = "https://tawk.to/chat/6afc8c8bcb23f43c7d2aa7d8/1k7l8a0nr?layout=modern";
 
 const CONTACTS = [
-    { title: "WhatsApp", subtitle: "+234 905 764 3470", href: `https://wa.me/${WHATSAPP_NUMBER}`, icon: PiWhatsappLogoBold },
+    { title: "WhatsApp", subtitle: "+234 707 235 0000", href: `https://wa.me/${WHATSAPP_NUMBER}`, icon: PiWhatsappLogoBold },
     { title: "Email", subtitle: SUPPORT_EMAIL, href: `mailto:${SUPPORT_EMAIL}`, icon: PiEnvelopeSimpleBold },
     { title: "Live chat", subtitle: "Chat with our team in your browser", href: LIVE_CHAT_URL, icon: PiChatsCircleBold },
 ];
