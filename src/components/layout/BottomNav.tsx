@@ -11,7 +11,8 @@ function Tab({ to, label, barIcon: Icon, activeIcon: ActiveIcon }: NavItem) {
             className={({ isActive }) =>
                 cn(
                     "group flex min-w-16 flex-col items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
-                    isActive ? "text-primary" : "text-muted-foreground hover:text-foreground",
+                    // Inactive tabs are a step lighter than the muted grey on light mode, label and icon alike.
+                    isActive ? "text-primary" : "text-[#9a9a9a] hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground",
                 )
             }
         >
@@ -19,11 +20,7 @@ function Tab({ to, label, barIcon: Icon, activeIcon: ActiveIcon }: NavItem) {
                 const Shown = isActive ? ActiveIcon : Icon;
                 return (
                     <>
-                        {/* Inactive icons read too heavy on light mode at the label's grey, so they're a step lighter there. */}
-                        <Shown
-                            className={cn("size-6", !isActive && "text-[#9a9a9a] group-hover:text-current dark:text-current")}
-                            aria-hidden
-                        />
+                        <Shown className="size-6" aria-hidden />
                         {label}
                     </>
                 );

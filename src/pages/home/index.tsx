@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { PiInfo } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { BalanceCard } from "@/components/BalanceCard";
 import { ContributorSheet } from "@/components/ContributorSheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLiveQuery } from "@/hooks/useLiveQuery";
+import { useSettings } from "@/hooks/useSettings";
 import type { Contributor, Page, Wallet, Wishlist } from "@/lib/types";
 import { formatCurrency, greeting, shareLink } from "@/utils/helper";
 import { BankDetailsPrompt } from "./components/BankDetailsPrompt";
@@ -17,6 +19,7 @@ import { TopWishlistCard } from "./components/TopWishlistCard";
 export default function Home() {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const settings = useSettings();
     const [giverId, setGiverId] = useState<string | null>(null);
 
     const wallet = useLiveQuery<Wallet>("/wallets/me", ["wallet:update", "wishItem:update"]);
@@ -42,6 +45,8 @@ export default function Home() {
     };
 
     const firstName = user?.name?.trim().split(" ")[0];
+    // Everything that isn't the wisher's share (Wishers' cut plus any referrer's).
+    const fee = settings ? Math.round((100 - settings.wisherSharePercentage) * 100) / 100 : 0;
 
     return (
         <div className="flex flex-col gap-6">
@@ -49,6 +54,14 @@ export default function Home() {
                 <p className="font-medium text-muted-foreground">Hi & {greeting()},</p>
                 <h1 className="text-2xl font-extrabold tracking-tight md:text-3xl">{firstName || "there"}</h1>
             </div>
+
+            {/* Explains why received amounts are a little under what givers sent. */}
+            {fee > 0 && (
+                <div className="flex items-start gap-3 rounded-2xl bg-orange-50 px-4 py-2.5 text-orange-600 dark:bg-orange-950/40 dark:text-orange-300">
+                    <PiInfo className="mt-0.5 size-5 shrink-0" aria-hidden />
+                    <p className="min-w-0 flex-1 text-sm font-medium">Wishers takes {fee}% of every gift you receive.</p>
+                </div>
+            )}
 
             <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-3">
                 <div className="lg:col-span-2">
