@@ -16,13 +16,14 @@ export function WishlistInsights({ wishlist }: { wishlist: Wishlist }) {
     return (
         <dl className="grid grid-cols-3 gap-3 [&:has(>:nth-child(4))]:grid-cols-2 sm:[&:has(>:nth-child(4))]:grid-cols-4">
             {tiles.map(({ label, value, icon: Icon, color, tint }) => (
-                <div key={label} className="flex items-center gap-3 rounded-2xl bg-secondary p-3">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: tint, color }}>
+                // Small screens stack icon, number and label so nothing gets cut off; wider ones sit side by side.
+                <div key={label} className="flex min-w-0 flex-col items-center gap-2 rounded-2xl bg-secondary p-3 text-center sm:flex-row sm:gap-3 sm:text-left">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl sm:size-10" style={{ backgroundColor: tint, color }}>
                         <Icon className="size-5" aria-hidden />
                     </span>
-                    <div className="min-w-0">
-                        <dd className="truncate text-lg leading-tight font-extrabold tabular-nums">{value}</dd>
-                        <dt className="truncate text-xs font-semibold text-muted-foreground">{label}</dt>
+                    <div className="min-w-0 max-w-full">
+                        <dd className="text-lg leading-tight font-extrabold break-words tabular-nums">{value.toLocaleString()}</dd>
+                        <dt className="text-xs font-semibold break-words text-muted-foreground">{label}</dt>
                     </div>
                 </div>
             ))}

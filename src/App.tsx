@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import ProtectedRoute from "./utils/ProtectedRoute";
@@ -15,19 +15,46 @@ import ForgotPassword from "./auth/forgotPassword";
 import ResetPassword from "./auth/resetPassword";
 import Error from "./pages/error";
 
-// DASHBOARD PAGES (loaded on first visit)
-const Home = lazy(() => import("./pages/home"));
-const Wishlists = lazy(() => import("./pages/wishlists"));
-const WishlistItem = lazy(() => import("./pages/wishlists/subPages/WishlistItem"));
-const WishItemPage = lazy(() => import("./pages/wishlists/subPages/WishItemPage"));
-const Wallet = lazy(() => import("./pages/wallet"));
-const BankDetails = lazy(() => import("./pages/wallet/subPages/BankDetails"));
-const Profile = lazy(() => import("./pages/profile"));
-const Referrals = lazy(() => import("./pages/profile/subPages/Referrals"));
-const Help = lazy(() => import("./pages/profile/subPages/Help"));
-const Notifications = lazy(() => import("./pages/notifications"));
+// DASHBOARD PAGES (split out of the first download, then fetched in the background once the app is idle)
+const pages = {
+    home: () => import("./pages/home"),
+    wishlists: () => import("./pages/wishlists"),
+    wishlistItem: () => import("./pages/wishlists/subPages/WishlistItem"),
+    wishItemPage: () => import("./pages/wishlists/subPages/WishItemPage"),
+    wallet: () => import("./pages/wallet"),
+    bankDetails: () => import("./pages/wallet/subPages/BankDetails"),
+    profile: () => import("./pages/profile"),
+    referrals: () => import("./pages/profile/subPages/Referrals"),
+    help: () => import("./pages/profile/subPages/Help"),
+    notifications: () => import("./pages/notifications"),
+};
+
+const Home = lazy(pages.home);
+const Wishlists = lazy(pages.wishlists);
+const WishlistItem = lazy(pages.wishlistItem);
+const WishItemPage = lazy(pages.wishItemPage);
+const Wallet = lazy(pages.wallet);
+const BankDetails = lazy(pages.bankDetails);
+const Profile = lazy(pages.profile);
+const Referrals = lazy(pages.referrals);
+const Help = lazy(pages.help);
+const Notifications = lazy(pages.notifications);
+
+// So the first click on a page doesn't wait for its code to download.
+function preloadPages() {
+    Object.values(pages).forEach((load) => load().catch(() => {}));
+}
 
 export default function App() {
+    useEffect(() => {
+        if ("requestIdleCallback" in window) {
+            const id = window.requestIdleCallback(preloadPages, { timeout: 3000 });
+            return () => window.cancelIdleCallback(id);
+        }
+        const id = setTimeout(preloadPages, 1500);
+        return () => clearTimeout(id);
+    }, []);
+
     return (
         <BrowserRouter>
             <ScrollToTop />
