@@ -19,6 +19,9 @@ export type User = {
 
 export type NavLayout = "sidebar" | "bottom";
 
+// Someone the user referred; email comes masked from the API (e.g. "id***u@gmail.com").
+export type ReferredUser = { _id: string; name: string; image?: string; email: string; createdAt?: string };
+
 export type TokenResponse = { accessToken: string; refreshToken: string; emailVerified: boolean };
 
 export type Wallet = {

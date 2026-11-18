@@ -1,14 +1,19 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { PiBankBold, PiCopyBold, PiFacebookLogoBold, PiUsersThreeBold, PiWalletBold, PiWhatsappLogoBold } from "react-icons/pi";
+import { PiBankBold, PiCaretDownBold, PiCopyBold, PiFacebookLogoBold, PiUsersThreeBold, PiWalletBold, PiWhatsappLogoBold } from "react-icons/pi";
 import { toast } from "sonner";
 import { BackLink } from "@/components/BackLink";
 import { PageHeader } from "@/components/PageHeader";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLiveQuery } from "@/hooks/useLiveQuery";
+import { usePaginated } from "@/hooks/usePaginated";
 import { useSettings } from "@/hooks/useSettings";
-import type { BankAccount, Wallet } from "@/lib/types";
-import { formatCurrency } from "@/utils/helper";
+import type { BankAccount, ReferredUser, Wallet } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { formatCurrency, formatDateShort } from "@/utils/helper";
 
 export default function Referrals() {
     const { user } = useAuth();
@@ -67,6 +72,8 @@ export default function Referrals() {
                 ))}
             </dl>
 
+            <ReferralsList count={user?.referralsCount ?? 0} />
+
             {/* The referrer's share only goes out when they have a bank account to receive it. */}
             {!bank.isPending && !bank.data && (
                 <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-amber-300 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/40">
@@ -86,4 +93,68 @@ export default function Referrals() {
             </section>
         </div>
     );
+}
+
+// Collapsed by default, 8 at a time. The heading shows the API's total, not just what's loaded.
+function ReferralsList({ count }: { count: number }) {
+    const [open, setOpen] = useState(false);
+    const referrals = usePaginated<ReferredUser>("/users/me/referrals", 8);
+    const total = referrals.data?.pages[0]?.total ?? count;
+
+    return (
+        <section className="mt-6 rounded-2xl border bg-card">
+            <button
+                type="button"
+                onClick={() => setOpen((o) => !o)}
+                aria-expanded={open}
+                className="flex min-h-11 w-full items-center justify-between gap-4 p-5 text-left"
+            >
+                <span className="text-lg font-bold">Your referrals ({total})</span>
+                <PiCaretDownBold className={cn("size-5 shrink-0 text-muted-foreground transition-transform", open && "rotate-180")} aria-hidden />
+            </button>
+
+            {open && (
+                <div className="border-t px-5 pb-5">
+                    {referrals.isPending ? (
+                        <div className="space-y-3 pt-4">
+                            {[0, 1, 2].map((i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}
+                        </div>
+                    ) : referrals.isError ? (
+                        <p className="pt-4 text-sm text-muted-foreground">Couldn't load your referrals. Try again shortly.</p>
+                    ) : !referrals.items.length ? (
+                        <p className="pt-4 text-sm text-muted-foreground">No one has signed up with your code yet.</p>
+                    ) : (
+                        <>
+                            <ul className="divide-y">
+                                {referrals.items.map((r) => (
+                                    <li key={r._id} className="flex items-center gap-3 py-3">
+                                        <Avatar className="size-10">
+                                            {r.image && <AvatarImage src={r.image} alt={`${r.name}'s photo`} className="object-cover" />}
+                                            <AvatarFallback className="bg-brand-mint font-semibold text-brand-dark">{initials(r.name)}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate font-semibold">{r.name}</p>
+                                            <p className="truncate text-sm text-muted-foreground">{r.email}</p>
+                                        </div>
+                                        {r.createdAt && <span className="shrink-0 text-xs text-muted-foreground">{formatDateShort(r.createdAt)}</span>}
+                                    </li>
+                                ))}
+                            </ul>
+                            {referrals.hasNextPage && (
+                                <div className="flex justify-center pt-2">
+                                    <Button variant="ghost" onClick={() => referrals.fetchNextPage()} disabled={referrals.isFetchingNextPage} className="font-bold">
+                                        {referrals.isFetchingNextPage ? "Loading…" : "See more"}
+                                    </Button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            )}
+        </section>
+    );
+}
+
+function initials(name: string) {
+    return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "W";
 }
