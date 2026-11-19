@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { PiBankBold, PiCaretDownBold, PiCopyBold, PiFacebookLogoBold, PiUsersThreeBold, PiWalletBold, PiWhatsappLogoBold } from "react-icons/pi";
+import { PiBankBold, PiCaretDownBold, PiCopyBold, PiFacebookLogoBold, PiInfo, PiUsersThreeBold, PiWalletBold, PiWhatsappLogoBold } from "react-icons/pi";
 import { toast } from "sonner";
 import { BackLink } from "@/components/BackLink";
 import { PageHeader } from "@/components/PageHeader";
@@ -71,6 +71,16 @@ export default function Referrals() {
                     </div>
                 ))}
             </dl>
+
+            {/* Paystack can't send a subaccount under ₦100, so smaller per-gift shares are never paid (api-wishers split.util). */}
+            {share > 0 && (
+                <div className="mt-6 flex items-start gap-3 rounded-2xl bg-orange-50 px-4 py-2.5 text-orange-600 dark:bg-orange-950/40 dark:text-orange-300">
+                    <PiInfo className="mt-0.5 size-5 shrink-0" aria-hidden />
+                    <p className="min-w-0 flex-1 text-sm font-medium">
+                        Referral bonuses are paid per gift, and only when your {share}% of that gift is ₦100 or more.
+                    </p>
+                </div>
+            )}
 
             <ReferralsList count={user?.referralsCount ?? 0} />
 
